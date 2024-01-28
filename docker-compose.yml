@@ -1,0 +1,55 @@
+version: "3.8"
+services:
+  db:
+    container_name: db
+    image: mysql:8.0
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --pid-file=/var/run/mysqld/mysqld.pid
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=db
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_USER=user_name
+      - MYSQL_PASSWORD=password
+    ports:
+      - "3306:3306"
+  api:
+    container_name: api
+    build: ./backend/
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - ./backend:/api
+    ports:
+      - "3001:3000"
+    depends_on:
+      - db
+    tty: true
+    stdin_open: true
+
+  phpmyadmin:
+    container_name: phpmyadmin_host
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "9999:80"
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db
+      - PMA_USER=root
+      - PMA_PASSWORD=password
+
+  front:
+    build: ./frontend/
+    volumes:
+      - ./frontend/app:/front
+    ports:
+      - 3000:3000
+    tty: true
+    stdin_open: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+volumes:
+  mysql-data:
+    driver: local

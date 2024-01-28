@@ -1,0 +1,9 @@
+tmp/
+node_modules/
+app/assets/builds/
+public/assets/
+log/
+vendor/bundle/
+coverage
+.ideas/
+data/
