@@ -1,6 +1,6 @@
 # 使用したいRubyのimageを指定
-FROM ruby:3.3.0
-ARG RUBYGEMS_VERSION=3.5.5
+FROM ruby:3.1.3
+ARG RUBYGEMS_VERSION=3.4.6
 
 # 必要なパッケージをインストール
 RUN apt-get update && apt-get install -y \
