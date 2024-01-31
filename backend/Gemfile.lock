@@ -172,7 +172,7 @@ DEPENDENCIES
   mysql2 (~> 0.5)
   puma (~> 5.0)
   rack-cors
-  rails (~> 7.0.8)
+  rails (~> 7.0.4)
   tzinfo-data
 
 RUBY VERSION

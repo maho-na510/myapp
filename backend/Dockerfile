@@ -1,6 +1,6 @@
 # 使用したいRubyのimageを指定
-FROM ruby:3.1.3
-ARG RUBYGEMS_VERSION=3.3.20
+FROM ruby:3.3.0
+ARG RUBYGEMS_VERSION=3.5.5
 
 # 必要なパッケージをインストール
 RUN apt-get update && apt-get install -y \
@@ -23,7 +23,9 @@ RUN mkdir /api
 WORKDIR /api
 
 # Gemをインストール
-COPY Gemfile Gemfile.lock /api/
+COPY Gemfile /api/Gemfile
+COPY Gemfile.lock /api/Gemfile.lock
+
 RUN gem update --system ${RUBYGEMS_VERSION} && \
     bundle install
 
