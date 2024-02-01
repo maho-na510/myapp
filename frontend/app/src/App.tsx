@@ -1,27 +1,19 @@
-import React, { useEffect, useState } from "react";
+import * as React from "react";
 import { TodoType } from "./types/todo";
 import { createTodo, deleteTodo, getTodos, updateTodo } from "./lib/api/todos";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Flex,
-  Heading,
-  Input,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, Button, Checkbox, Flex, Heading, Input, VStack } from "@chakra-ui/react";
 
-const App = () => {
-  const [todos, setTodos] = useState<TodoType[]>([]);
-  const [title, setTitle] = useState<string>("");
+const App: React.FC = () => {
+  const [todos, setTodos] = React.useState<TodoType[]>([]);
+  const [title, setTitle] = React.useState<string>("");
 
   const handleCreateTodo = async () => {
     const response = await createTodo({
       title: title,
       completed: false,
     });
-    setTodos([...todos, response.data]);
+    setTodos((prevTodos) => [...prevTodos, response.data]);
     setTitle("");
   };
 
@@ -29,15 +21,17 @@ const App = () => {
     const response = await updateTodo(id, {
       completed: !completed,
     });
-    setTodos(todos.map((todo) => (todo.id === id ? response.data : todo)));
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) => (todo.id === id ? response.data : todo))
+    );
   };
 
   const handleDeleteTodo = async (id: number) => {
     await deleteTodo(id);
-    setTodos(todos.filter((todo) => todo.id !== id));
+    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     getTodos().then((response) => setTodos(response.data));
   }, []);
 
@@ -52,8 +46,8 @@ const App = () => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        <Button colorScheme="blue" mx={4}>
-          <AddIcon onClick={handleCreateTodo} />
+        <Button colorScheme="blue" mx={4} onClick={handleCreateTodo}>
+          <AddIcon />
         </Button>
       </Flex>
       {todos.map((todo) => (
@@ -64,6 +58,8 @@ const App = () => {
           alignItems="center"
         >
           <Checkbox
+            colorScheme="blue"
+            size="lg"
             isChecked={todo.completed}
             onChange={() => handleToggleTodo(todo.id, todo.completed)}
           >
