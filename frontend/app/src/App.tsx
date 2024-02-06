@@ -32,7 +32,16 @@ const App: React.FC = () => {
   };
 
   React.useEffect(() => {
-    getTodos().then((response) => setTodos(response.data));
+    const fetchTodos = async () => {
+      try {
+        const response = await getTodos();
+        setTodos(response.data);
+      } catch (error) {
+        console.error("Error fetching todos:", error);
+      }
+    };
+  
+    fetchTodos();
   }, []);
 
   return (
