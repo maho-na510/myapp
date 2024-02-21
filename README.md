@@ -1,10 +1,5 @@
 **backend**
 
-APIモードでRailsプロジェクトを作ります
-```
-docker compose run api rails new . --force --database=mysql --api
-```
-
 イメージをビルド
 ```
 docker compose build
@@ -14,13 +9,6 @@ docker compose build
 ```
 docker compose up
 docker compose exec api rails db:create
-```
-
-Gemの設定を変更
-```
-gem "rack-cors"
-
-docker compose exec api bundle install
 ```
 
 **frontend**
