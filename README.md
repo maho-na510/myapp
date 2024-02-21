@@ -10,6 +10,10 @@ docker compose build
 docker compose up
 docker compose exec api rails db:create
 ```
+データベースをmigrate
+```
+docker compose exec api rails db:migrate
+```
 
 **frontend**
 
@@ -17,14 +21,4 @@ docker compose exec api rails db:create
 ```
 docker compose up --build
 docker compose exec front bash
-```
-
-コンテナ内でプロジェクトをスタート
-```
-npm start
-```
-
-データベースをmigrate
-```
-docker compose exec api rails db:migrate
 ```
