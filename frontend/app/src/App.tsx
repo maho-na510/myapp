@@ -1,9 +1,9 @@
-// src/App.tsx
 import * as React from "react";
+import { ChakraProvider, VStack, Flex, Heading, Button, Input } from "@chakra-ui/react";
 import { TodoType } from "./types/todo";
 import { createTodo, deleteTodo, getTodos, updateTodo } from "./lib/api/todos";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
-import { Box, Button, Checkbox, Flex, Heading, Input, VStack } from "@chakra-ui/react";
+import TodoList from "./components/TodoList";
 import LoginForm from "./pages/LoginForm";
 
 const App: React.FC = () => {
@@ -16,8 +16,20 @@ const App: React.FC = () => {
     const token = localStorage.getItem('token');
     if (token) {
       setIsLoggedIn(true);
+      // ログイン後にTodoリストを取得する
+      fetchTodos();
     }
   }, []);
+
+  // Todoリストを取得する関数
+  const fetchTodos = async () => {
+    try {
+      const response = await getTodos();
+      setTodos(response.data);
+    } catch (error) {
+      console.error("Failed to fetch todos:", error);
+    }
+  };
 
   const handleCreateTodo = async () => {
     const response = await createTodo({
@@ -42,46 +54,41 @@ const App: React.FC = () => {
     setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
   };
 
+  const handleLogout = () => {
+    // ローカルストレージからトークンを削除し、ログイン状態を更新する
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+  };
+
   return (
-    <VStack spacing={4} padding={4}>
-      <Heading as="h1" mb="8">
-        Todoアプリ
-      </Heading>
-      {isLoggedIn ? (
-        <React.Fragment>
-          <Flex>
-            <Input
-              placeholder="Todoを入力"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <Button colorScheme="blue" mx={4} onClick={handleCreateTodo}>
-              <AddIcon />
-            </Button>
-          </Flex>
-          {todos.map((todo) => (
-            <Box
-              key={todo.id}
-              display="flex"
-              flexDirection="row"
-              alignItems="center"
-            >
-              <Checkbox
-                colorScheme="blue"
-                size="lg"
-                isChecked={todo.completed}
-                onChange={() => handleToggleTodo(todo.id, todo.completed)}
-              >
-                {todo.title}
-              </Checkbox>
-              <DeleteIcon onClick={() => handleDeleteTodo(todo.id)} />
-            </Box>
-          ))}
-        </React.Fragment>
-      ) : (
-        <LoginForm />
-      )}
-    </VStack>
+    <ChakraProvider>
+      <VStack spacing={4} padding={4}>
+        <Flex justify="center" align="center" w="100%">
+          <Heading as="h1">Todoアプリ</Heading>
+          {isLoggedIn && (
+            <Button colorScheme="gray" onClick={handleLogout}>ログアウト</Button>
+          )}
+        </Flex>
+        {isLoggedIn ? (
+          <React.Fragment>
+            <Flex>
+              <Input
+                placeholder="Todoを入力"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+              <Button colorScheme="blue" mx={4} onClick={handleCreateTodo}>
+                <AddIcon />
+              </Button>
+            </Flex>
+            {/* TodoListコンポーネントを表示する */}
+            <TodoList todos={todos} onToggleTodo={handleToggleTodo} onDeleteTodo={handleDeleteTodo} />
+          </React.Fragment>
+        ) : (
+          <LoginForm />
+        )}
+      </VStack>
+    </ChakraProvider>
   );
 };
 
