@@ -26,8 +26,11 @@ class Api::V1::TodosController < ApplicationController
     end
   
     def destroy
-      @todo.destroy
-      head :no_content
+      if @todo.destroy
+        head :ok
+      else
+        head :not_found
+      end
     end
   
     private

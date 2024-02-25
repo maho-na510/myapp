@@ -4,7 +4,7 @@ import { TodoType } from "./types/todo";
 import { createTodo, deleteTodo, getTodos, updateTodo } from "./lib/api/todos";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Box, Button, Checkbox, Flex, Heading, Input, VStack } from "@chakra-ui/react";
-import Loginform from "./pages/Loginform";
+import LoginForm from "./pages/LoginForm";
 
 const App: React.FC = () => {
   const [todos, setTodos] = React.useState<TodoType[]>([]);
@@ -79,7 +79,7 @@ const App: React.FC = () => {
           ))}
         </React.Fragment>
       ) : (
-        <Loginform />
+        <LoginForm />
       )}
     </VStack>
   );
