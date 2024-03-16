@@ -48,4 +48,55 @@ class Api::V1::TodosControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
     assert_not_nil Todo.find_by(id: @todo.id)
   end
+
+  test 'should return unauthorized when token is invalid' do
+    post '/api/v1/todos', headers: { 'Authorization' => "Bearer invalid_token" }, params: { title: 'New Todo', completed: false }
+
+    assert_response :unauthorized
+    assert_nil Todo.find_by(title: 'New Todo')
+  end
+
+  test 'should return forbidden if user tries to update other user\'s todo' do
+    patch "/api/v1/todos/#{todos(:two).id}", headers: { 'Authorization' => "Bearer #{@token}" }, params: { completed: true }
+
+    assert_response :forbidden
+    assert_not Todo.find(todos(:two).id).completed
+  end
+
+  test 'should return forbidden if user tries to delete other user\'s todo' do
+    delete "/api/v1/todos/#{todos(:two).id}", headers: { 'Authorization' => "Bearer #{@token}" }
+
+    assert_response :forbidden
+    assert_not_nil Todo.find_by(id: todos(:two).id)
+  end
+  test 'should not create todo with invalid parameters' do
+    post '/api/v1/todos', headers: { 'Authorization' => "Bearer #{@token}" }, params: { completed: false }
+
+    assert_response :unprocessable_entity
+    assert_nil Todo.find_by(title: 'New Todo')
+  end
+
+  test 'should handle not found error gracefully' do
+    get '/api/v1/todos/99999', headers: { 'Authorization' => "Bearer #{@token}" }
+
+    assert_response :not_found
+  end
+
+  test 'should handle internal server error gracefully' do
+    # 仮想的なエラーを発生させることで、500エラーをシミュレートする
+    Todo.stub(:find, ->(_id) { raise StandardError.new }) do
+      get "/api/v1/todos/#{@todo.id}", headers: { 'Authorization' => "Bearer #{@token}" }
+      assert_response :internal_server_error
+    end
+  end
+
+  # パフォーマンスのテスト
+  test 'should handle large number of todos without performance degradation' do
+    # 大量のToDoを生成して、応答時間が一定であることを確認する
+    assert_performance_constant do |n|
+      n.times do
+        post '/api/v1/todos', headers: { 'Authorization' => "Bearer #{@token}" }, params: { title: 'New Todo', completed: false }
+      end
+    end
+  end
 end
