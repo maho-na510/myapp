@@ -27,9 +27,9 @@ class Api::V1::TodosController < ApplicationController
   
     def destroy
       if @todo.destroy
-        head :ok
+        render json: { message: "Todo was successfully destroyed." }, status: :ok
       else
-        head :not_found
+        render json: { error: "Failed to destroy todo." }, status: :unprocessable_entity
       end
     end
   
